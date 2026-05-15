@@ -261,6 +261,7 @@ async function apiCall(endpoint, method, body = null) {
         }
         return res;
     } catch (err) {
+        console.error('Fetch Error:', err);
         showToast('Network error. Is the backend running?', 'error');
         return { ok: false };
     }

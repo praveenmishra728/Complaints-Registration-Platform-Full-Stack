@@ -1,4 +1,4 @@
-const BACKEND_BASE_URL = 'https://Complaints-Registration-Platform-Full-Stack/Frontend/';
+const BACKEND_BASE_URL = 'http://127.0.0.1:3000';
 const API_BASE = `${BACKEND_BASE_URL}/api`;
 // DOM Elements
 const sections = {

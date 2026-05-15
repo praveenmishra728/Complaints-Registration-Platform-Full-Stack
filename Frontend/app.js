@@ -1,4 +1,4 @@
-const BACKEND_BASE_URL = 'https://praveenmishra728.github.io/Complaints-Registration-Platform-Full-Stack/Frontend/';
+const BACKEND_BASE_URL = 'https://Complaints-Registration-Platform-Full-Stack/Frontend/';
 const API_BASE = `${BACKEND_BASE_URL}/api`;
 // DOM Elements
 const sections = {

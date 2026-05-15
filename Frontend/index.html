@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complaint Central | AI-Powered Resolution</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav id="navbar" class="hidden">
+        <div class="logo">ComplaintCentral</div>
+        <div class="nav-links">
+            <button id="nav-my-complaints" class="nav-btn">My Complaints</button>
+            <button id="nav-admin-dashboard" class="nav-btn hidden">Admin Dashboard</button>
+            <button id="logout-btn" class="nav-btn logout">Logout</button>
+        </div>
+    </nav>
+
+    <main id="app-container">
+        <!-- Register Section -->
+        <section id="register-page" class="page-section">
+            <div class="glass-card">
+                <h1>Create Account</h1>
+                <p class="subtitle">Join our community to voice your concerns.</p>
+                <form id="register-form">
+                    <div class="form-group">
+                        <label for="reg-name">Full Name</label>
+                        <input type="text" id="reg-name" placeholder="John Doe" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-email">Email Address</label>
+                        <input type="email" id="reg-email" placeholder="john@example.com" required>
+                    </div>
+                    <button type="submit" class="primary-btn">Send OTP</button>
+                </form>
+                <div id="otp-screen" class="hidden">
+                    <p>An OTP has been sent to your email.</p>
+                    <form id="otp-form">
+                        <div class="form-group">
+                            <label for="reg-otp">Enter 6-digit OTP</label>
+                            <input type="text" id="reg-otp" maxlength="6" placeholder="000000" required>
+                        </div>
+                        <button type="submit" class="primary-btn">Verify OTP</button>
+                    </form>
+                </div>
+                <div id="password-screen" class="hidden">
+                    <p>Setup your secure password.</p>
+                    <form id="password-form">
+                        <div class="form-group">
+                            <label for="reg-pass">Password</label>
+                            <input type="password" id="reg-pass" placeholder="••••••••" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-confirm-pass">Confirm Password</label>
+                            <input type="password" id="reg-confirm-pass" placeholder="••••••••" required>
+                        </div>
+                        <button type="submit" class="primary-btn">Complete Registration</button>
+                    </form>
+                </div>
+                <p class="switch-auth">Already have an account? <a href="#" id="go-to-login">Login here</a></p>
+            </div>
+        </section>
+
+        <!-- Login Section -->
+        <section id="login-page" class="page-section hidden">
+            <div class="glass-card">
+                <h1>Welcome Back</h1>
+                <p class="subtitle">Login to track your complaints.</p>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="login-email">Email Address</label>
+                        <input type="email" id="login-email" placeholder="john@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-pass">Password</label>
+                        <input type="password" id="login-pass" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="primary-btn">Login</button>
+                </form>
+                <p class="switch-auth">Don't have an account? <a href="#" id="go-to-register">Register here</a></p>
+            </div>
+        </section>
+
+        <!-- My Complaints Section -->
+        <section id="my-complaints-page" class="page-section hidden">
+            <div class="dashboard-header">
+                <h2>My Complaints</h2>
+                <button id="btn-new-complaint" class="primary-btn small">Submit New Complaint</button>
+            </div>
+            <div id="complaints-list" class="complaints-container">
+                <!-- Complaints will be loaded here -->
+                <p class="empty-msg">No complaints submitted yet.</p>
+            </div>
+        </section>
+
+        <!-- Complaint Submission Section -->
+        <section id="submit-complaint-page" class="page-section hidden">
+            <div class="glass-card wide">
+                <h1>Submit Complaint</h1>
+                <p class="subtitle">Describe your issue in detail.</p>
+                
+                <div id="initial-step">
+                    <div class="form-group">
+                        <label for="complaint-text">Your Complaint</label>
+                        <textarea id="complaint-text" rows="5" placeholder="Describe what happened..."></textarea>
+                    </div>
+                    <button id="btn-get-ai-question" class="secondary-btn">Next Step: AI Follow-up</button>
+                </div>
+
+                <div id="ai-step" class="hidden">
+                    <div class="ai-box">
+                        <p class="ai-label">AI Follow-up Question:</p>
+                        <p id="display-ai-question" class="ai-question-text"></p>
+                    </div>
+                    <div class="form-group">
+                        <label for="ai-answer">Your Answer</label>
+                        <textarea id="ai-answer" rows="3" placeholder="Provide more details..."></textarea>
+                    </div>
+                    <button id="btn-submit-full-complaint" class="primary-btn">Submit Complaint</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Admin Dashboard Section -->
+        <section id="admin-dashboard-page" class="page-section hidden">
+            <div class="dashboard-header">
+                <h2>Admin Dashboard</h2>
+                <p>All user complaints are listed below.</p>
+            </div>
+            <div id="admin-complaints-list" class="complaints-container">
+                <!-- All complaints will be loaded here -->
+            </div>
+        </section>
+    </main>
+
+    <div id="toast-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -102,10 +102,11 @@ router.post('/login', async (req, res) => {
 
     const token = jwt.sign({ id: userData.id, email: userData.email, role: userData.role }, process.env.JWT_SECRET);
 
+    const isProduction = process.env.NODE_ENV === 'production';
     res.cookie('token', token, { 
       httpOnly: true, 
-      secure: false, 
-      sameSite: 'lax',
+      secure: isProduction, 
+      sameSite: isProduction ? 'none' : 'lax',
       maxAge: 24 * 60 * 60 * 1000 // 1 day
     });
 
@@ -121,7 +122,12 @@ router.post('/login', async (req, res) => {
 
 // POST /api/auth/logout
 router.post('/logout', (req, res) => {
-  res.clearCookie('token');
+  const isProduction = process.env.NODE_ENV === 'production';
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'lax'
+  });
   res.json({ message: 'Logged out successfully' });
 });
 

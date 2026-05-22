@@ -73,11 +73,11 @@ router.post('/register', async (req, res) => {
     if (userData.otp !== otp) return res.status(400).json({ error: 'Invalid OTP' });
     if (new Date() > new Date(userData.otp_expiry)) return res.status(400).json({ error: 'OTP expired' });
 
-    await db.update(users).set({ 
-      password, 
-      is_verified: true, 
-      otp: null, 
-      otp_expiry: null 
+    await db.update(users).set({
+      password,
+      is_verified: true,
+      otp: null,
+      otp_expiry: null
     }).where(eq(users.email, email));
 
     res.json({ message: 'Registration successful! You can now login.' });
@@ -103,14 +103,14 @@ router.post('/login', async (req, res) => {
     const token = jwt.sign({ id: userData.id, email: userData.email, role: userData.role }, process.env.JWT_SECRET);
 
     const isProduction = process.env.NODE_ENV === 'production';
-    res.cookie('token', token, { 
-      httpOnly: true, 
-      secure: isProduction, 
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: isProduction,
       sameSite: isProduction ? 'none' : 'lax',
       maxAge: 24 * 60 * 60 * 1000 // 1 day
     });
 
-    res.json({ 
+    res.json({
       message: 'Login successful',
       user: { name: userData.name, email: userData.email, role: userData.role }
     });

@@ -1,4 +1,4 @@
-const BACKEND_BASE_URL = 'http://127.0.0.1:3000';
+const BACKEND_BASE_URL = 'https://complaints-registration-platform-full-o0bp.onrender.com';
 const API_BASE = `${BACKEND_BASE_URL}/api`;
 // DOM Elements
 const sections = {

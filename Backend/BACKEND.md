@@ -1,7 +1,7 @@
 # Backend Requirements
 
 ## Overview
-Node.js and Express.js REST API server. Connected to Supabase as the database. Drizzle is used to define table schemas and generate database migrations. Emails are sent via Nodemailer using a Gmail account with App Passwords. AI follow-up questions are generated using the Gemini API (use gemini-2.5-flash-lite).
+Node.js and Express.js REST API server. Connected to Supabase as the database. Drizzle is used to define table schemas and generate database migrations. Emails are sent via Resend email service provider. AI follow-up questions are generated using the Gemini API (use gemini-2.5-flash-lite).
 
 ---
 
@@ -83,8 +83,7 @@ Node.js and Express.js REST API server. Connected to Supabase as the database. D
 ---
 
 ## Email Service
-- Uses Nodemailer configured with a Gmail account
-- Gmail App Password is used instead of the main account password
+- Uses Resend email service provider
 - Sends OTP emails during registration with a simple plain-text body containing the code
 
 ## AI Service
@@ -102,8 +101,8 @@ Node.js and Express.js REST API server. Connected to Supabase as the database. D
 
 ## Environment Variables Required
 - Supabase database connection URL
-- Gmail sender email address
-- Gmail App Password
+- Resend API key
+- Resend sender email address
 - Gemini API key
 - JWT secret
 - Backend port

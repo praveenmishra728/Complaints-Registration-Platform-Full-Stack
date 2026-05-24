@@ -2,7 +2,7 @@ import express from 'express';
 import { db } from '../db.js';
 import { users } from '../schema.js';
 import { eq, and } from 'drizzle-orm';
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 
@@ -10,14 +10,8 @@ dotenv.config();
 
 const router = express.Router();
 
-// Nodemailer setup
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_PASS,
-  },
-});
+// Resend setup
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Helper to generate OTP
 const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
@@ -46,12 +40,18 @@ router.post('/send-otp', async (req, res) => {
     }
 
     // Send Email
-    await transporter.sendMail({
-      from: process.env.GMAIL_USER,
+    const { data, error } = await resend.emails.send({
+      from: process.env.RESEND_FROM_EMAIL || 'info@pmishrarbl.shop',
       to: email,
       subject: 'Your Registration OTP',
       text: `Hello ${name},\n\nYour OTP for registration is: ${otp}. It will expire in 10 minutes.`,
     });
+
+    if (error) {
+      console.error('Error sending email via Resend:', error);
+      throw new Error(error.message || 'Failed to send OTP email');
+    }
+
 
     res.json({ message: 'OTP sent successfully to your email' });
   } catch (error) {

@@ -112,6 +112,7 @@ router.post('/login', async (req, res) => {
 
     res.json({
       message: 'Login successful',
+      token,
       user: { name: userData.name, email: userData.email, role: userData.role }
     });
   } catch (error) {
@@ -133,7 +134,15 @@ router.post('/logout', (req, res) => {
 
 // GET /api/auth/me
 router.get('/me', (req, res) => {
-  const token = req.cookies.token;
+  let token = req.cookies.token;
+  
+  if (!token && req.headers.authorization) {
+    const parts = req.headers.authorization.split(' ');
+    if (parts.length === 2 && parts[0] === 'Bearer') {
+      token = parts[1];
+    }
+  }
+
   if (!token) return res.status(401).json({ error: 'Not authenticated' });
 
   try {

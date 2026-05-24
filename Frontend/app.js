@@ -1,4 +1,4 @@
-const BACKEND_BASE_URL = 'http://localhost:3000';
+const BACKEND_BASE_URL = 'https://complaints-registration-platform-full-o0bp.onrender.com';
 const API_BASE = `${BACKEND_BASE_URL}/api`;
 // DOM Elements
 const sections = {
@@ -28,7 +28,15 @@ document.addEventListener('DOMContentLoaded', () => {
 // --- Auth State ---
 async function checkSession() {
     try {
-        const res = await fetch(`${API_BASE}/auth/me`, { credentials: 'include' });
+        const headers = {};
+        const token = localStorage.getItem('token');
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+        const res = await fetch(`${API_BASE}/auth/me`, {
+            credentials: 'include',
+            headers
+        });
         if (res.ok) {
             const data = await res.json();
             currentUser = data.user;
@@ -147,6 +155,9 @@ async function handleLogin(e) {
     if (res.ok) {
         const data = await res.json();
         currentUser = data.user;
+        if (data.token) {
+            localStorage.setItem('token', data.token);
+        }
         showToast('Welcome back!', 'success');
         showDashboard();
     }
@@ -155,6 +166,7 @@ async function handleLogin(e) {
 async function logout() {
     await apiCall('/auth/logout', 'POST');
     currentUser = null;
+    localStorage.removeItem('token');
     showPage('login');
 }
 
@@ -246,9 +258,15 @@ function renderComplaint(c, isAdmin = false) {
 
 // --- Helpers ---
 async function apiCall(endpoint, method, body = null) {
+    const headers = { 'Content-Type': 'application/json' };
+    const token = localStorage.getItem('token');
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+
     const options = {
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         credentials: 'include'
     };
     if (body) options.body = JSON.stringify(body);

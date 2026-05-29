@@ -43,7 +43,13 @@ app.get('/debug', async (req, res) => {
       dbStatus = 'connected';
     }
   } catch (e) {
-    dbStatus = 'error: ' + e.message;
+    dbStatus = {
+      message: e.message,
+      code: e.code,
+      stack: e.stack,
+      detail: e.detail,
+      hint: e.hint
+    };
   }
   res.json({
     NODE_ENV: process.env.NODE_ENV || 'NOT SET',

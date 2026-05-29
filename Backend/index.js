@@ -48,7 +48,9 @@ app.get('/debug', async (req, res) => {
       code: e.code,
       stack: e.stack,
       detail: e.detail,
-      hint: e.hint
+      hint: e.hint,
+      cause: e.cause ? { message: e.cause.message, code: e.cause.code, stack: e.cause.stack } : null,
+      originalError: e.originalError ? { message: e.originalError.message } : null
     };
   }
   res.json({

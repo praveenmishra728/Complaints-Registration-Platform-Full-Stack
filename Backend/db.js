@@ -12,7 +12,7 @@ try {
   if (!connectionString || connectionString === 'your_supabase_connection_string') {
     throw new Error("DATABASE_URL is not configured. Please update your .env file.");
   }
-  client = postgres(connectionString, { ssl: 'require' });
+  client = postgres(connectionString, { ssl: 'require', prepare: false });
   console.log("✅ Database client initialized");
 } catch (err) {
   console.error("❌ Database Connection Error:", err.message);

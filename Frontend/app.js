@@ -1,4 +1,7 @@
-const BACKEND_BASE_URL = 'https://complaints-registration-platform-full-o0bp.onrender.com';
+const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const BACKEND_BASE_URL = isLocalhost 
+    ? 'http://localhost:3000' 
+    : 'https://complaints-registration-platform-full-o0bp.onrender.com';
 const API_BASE = `${BACKEND_BASE_URL}/api`;
 // DOM Elements
 const sections = {

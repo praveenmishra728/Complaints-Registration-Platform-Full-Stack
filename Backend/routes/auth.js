@@ -18,13 +18,18 @@ const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString()
 
 // POST /api/auth/send-otp
 router.post('/send-otp', async (req, res) => {
+  console.log('[ENTRY] POST /api/auth/send-otp');
   const { name, email } = req.body;
-  if (!name || !email) return res.status(400).json({ error: 'Name and Email are required' });
+  if (!name || !email) {
+    console.log('[EXIT] POST /api/auth/send-otp - Missing name or email');
+    return res.status(400).json({ error: 'Name and Email are required' });
+  }
 
   try {
     // Check if user already exists and is verified
     const existingUser = await db.select().from(users).where(eq(users.email, email)).limit(1);
     if (existingUser.length > 0 && existingUser[0].is_verified) {
+      console.log('[EXIT] POST /api/auth/send-otp - Email already registered');
       return res.status(400).json({ error: 'Email already registered and verified. Please login.' });
     }
 
@@ -52,26 +57,39 @@ router.post('/send-otp', async (req, res) => {
       throw new Error(error.message || 'Failed to send OTP email');
     }
 
-
     res.json({ message: 'OTP sent successfully to your email' });
+    console.log('[EXIT] POST /api/auth/send-otp - Success');
   } catch (error) {
-    console.error('Error in send-otp:', error);
+    console.error('[ERROR] in send-otp:', error);
     res.status(500).json({ error: 'Failed to send OTP. Please try again.' });
   }
 });
 
 // POST /api/auth/register
 router.post('/register', async (req, res) => {
+  console.log('[ENTRY] POST /api/auth/register');
   const { email, otp, password } = req.body;
-  if (!email || !otp || !password) return res.status(400).json({ error: 'All fields are required' });
+  if (!email || !otp || !password) {
+    console.log('[EXIT] POST /api/auth/register - Missing fields');
+    return res.status(400).json({ error: 'All fields are required' });
+  }
 
   try {
     const user = await db.select().from(users).where(eq(users.email, email)).limit(1);
-    if (user.length === 0) return res.status(404).json({ error: 'User not found' });
+    if (user.length === 0) {
+      console.log('[EXIT] POST /api/auth/register - User not found');
+      return res.status(404).json({ error: 'User not found' });
+    }
 
     const userData = user[0];
-    if (userData.otp !== otp) return res.status(400).json({ error: 'Invalid OTP' });
-    if (new Date() > new Date(userData.otp_expiry)) return res.status(400).json({ error: 'OTP expired' });
+    if (userData.otp !== otp) {
+      console.log('[EXIT] POST /api/auth/register - Invalid OTP');
+      return res.status(400).json({ error: 'Invalid OTP' });
+    }
+    if (new Date() > new Date(userData.otp_expiry)) {
+      console.log('[EXIT] POST /api/auth/register - OTP expired');
+      return res.status(400).json({ error: 'OTP expired' });
+    }
 
     await db.update(users).set({
       password,
@@ -81,32 +99,45 @@ router.post('/register', async (req, res) => {
     }).where(eq(users.email, email));
 
     res.json({ message: 'Registration successful! You can now login.' });
+    console.log('[EXIT] POST /api/auth/register - Success');
   } catch (error) {
-    console.error('Error in register:', error);
+    console.error('[ERROR] in register:', error);
     res.status(500).json({ error: 'Registration failed' });
   }
 });
 
 // POST /api/auth/login
 router.post('/login', async (req, res) => {
+  console.log('[ENTRY] POST /api/auth/login');
   const { email, password } = req.body;
-  if (!email || !password) return res.status(400).json({ error: 'Email and password are required' });
+  if (!email || !password) {
+    console.log('[EXIT] POST /api/auth/login - Missing email or password');
+    return res.status(400).json({ error: 'Email and password are required' });
+  }
 
   try {
     const user = await db.select().from(users).where(eq(users.email, email)).limit(1);
-    if (user.length === 0) return res.status(401).json({ error: 'Invalid credentials' });
+    if (user.length === 0) {
+      console.log('[EXIT] POST /api/auth/login - User not found');
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
 
     const userData = user[0];
-    if (!userData.is_verified) return res.status(401).json({ error: 'Please verify your email first' });
-    if (userData.password !== password) return res.status(401).json({ error: 'Invalid credentials' });
+    if (!userData.is_verified) {
+      console.log('[EXIT] POST /api/auth/login - User unverified');
+      return res.status(401).json({ error: 'Please verify your email first' });
+    }
+    if (userData.password !== password) {
+      console.log('[EXIT] POST /api/auth/login - Incorrect password');
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
 
     const token = jwt.sign({ id: userData.id, email: userData.email, role: userData.role }, process.env.JWT_SECRET);
 
-    const isProduction = process.env.NODE_ENV === 'production';
     res.cookie('token', token, {
       httpOnly: true,
-      secure: isProduction,
-      sameSite: isProduction ? 'none' : 'lax',
+      secure: true,
+      sameSite: 'none',
       maxAge: 24 * 60 * 60 * 1000 // 1 day
     });
 
@@ -115,25 +146,28 @@ router.post('/login', async (req, res) => {
       token,
       user: { name: userData.name, email: userData.email, role: userData.role }
     });
+    console.log('[EXIT] POST /api/auth/login - Success');
   } catch (error) {
-    console.error('Error in login:', error);
+    console.error('[ERROR] in login:', error);
     res.status(500).json({ error: 'Login failed' });
   }
 });
 
 // POST /api/auth/logout
 router.post('/logout', (req, res) => {
-  const isProduction = process.env.NODE_ENV === 'production';
+  console.log('[ENTRY] POST /api/auth/logout');
   res.clearCookie('token', {
     httpOnly: true,
-    secure: isProduction,
-    sameSite: isProduction ? 'none' : 'lax'
+    secure: true,
+    sameSite: 'none'
   });
   res.json({ message: 'Logged out successfully' });
+  console.log('[EXIT] POST /api/auth/logout - Success');
 });
 
 // GET /api/auth/me
 router.get('/me', (req, res) => {
+  console.log('[ENTRY] GET /api/auth/me');
   let token = req.cookies.token;
   
   if (!token && req.headers.authorization) {
@@ -143,12 +177,17 @@ router.get('/me', (req, res) => {
     }
   }
 
-  if (!token) return res.status(401).json({ error: 'Not authenticated' });
+  if (!token) {
+    console.log('[EXIT] GET /api/auth/me - Not authenticated');
+    return res.status(401).json({ error: 'Not authenticated' });
+  }
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     res.json({ user: decoded });
+    console.log('[EXIT] GET /api/auth/me - Success');
   } catch (error) {
+    console.error('[ERROR] in me:', error);
     res.status(401).json({ error: 'Invalid token' });
   }
 });

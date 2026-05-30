@@ -5,6 +5,7 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
+import morgan from 'morgan';
 import authRoutes from './routes/auth.js';
 import complaintRoutes from './routes/complaints.js';
 
@@ -13,15 +14,35 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Use Morgan for API response tracking
+app.use(morgan('dev'));
+
 // Request Logger Middleware
 app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  console.log(`[ENTRY] Request: ${req.method} ${req.url}`);
+  res.on('finish', () => {
+    console.log(`[EXIT] Request completed: ${req.method} ${req.url} with status ${res.statusCode}`);
+  });
   next();
 });
 
-// Middleware
+const allowedOrigins = [
+  'http://localhost:5500',
+  'http://127.0.0.1:5500',
+  'https://praveenmishra728.github.io',
+  'https://praveenmishra728.github.io/Complaints-Registration-Platform-Full-Stack'
+];
+
 app.use(cors({
-  origin: true, // Allows any origin during development, reflecting the request origin
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    const message = 'The CORS policy for this site does not allow access from the specified Origin.';
+    return callback(new Error(message), false);
+  },
   credentials: true
 }));
 app.use(express.json());
@@ -33,11 +54,14 @@ app.use('/api', complaintRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
+  console.log('[ENTRY] GET /health handler');
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  console.log('[EXIT] GET /health handler response sent');
 });
 
 // Debug endpoint - check env vars and DB
 app.get('/debug', async (req, res) => {
+  console.log('[ENTRY] GET /debug handler');
   const { db } = await import('./db.js');
   let dbStatus = 'not connected';
   try {
@@ -64,6 +88,7 @@ app.get('/debug', async (req, res) => {
     GEMINI_API_KEY: process.env.GEMINI_API_KEY ? 'SET ✅' : 'NOT SET ❌',
     db: dbStatus,
   });
+  console.log('[EXIT] GET /debug handler response sent');
 });
 
 app.use((err, req, res, next) => {

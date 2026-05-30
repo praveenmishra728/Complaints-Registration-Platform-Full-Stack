@@ -30,7 +30,9 @@ const allowedOrigins = [
   'http://localhost:5500',
   'http://127.0.0.1:5500',
   'https://praveenmishra728.github.io',
-  'https://praveenmishra728.github.io/Complaints-Registration-Platform-Full-Stack'
+  'https://praveenmishra728.github.io/Complaints-Registration-Platform-Full-Stack',
+  'https://arrear.pmishrarbl.shop',
+  'https://arrear.pmishrarbl.shop/'
 ];
 
 app.use(cors({
